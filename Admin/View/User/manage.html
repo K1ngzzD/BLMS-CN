@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>图书借阅管理系统</title>
+    <script src="./Resources/jquery.min.js"></script>
+    <link rel="stylesheet" href="./Resources/bootstrap.min.css">
+    <script src="./Resources/bootstrap.min.js"></script>
+    <style type="text/css">
+        td {
+            vertical-align: middle !important;
+        }
+    </style>
+</head>
+
+<body style="background-image: url(./Resources/img/background2.jpg);background-size:cover;">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav"
+                    aria-expanded="false">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="JavaScript:void(0)">
+                    <b>图书借阅管理系统</b>
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="nav">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="?p=Admin&c=Index&a=index">主页</a>
+                    </li>
+                    <li>
+                        <a href="?p=Admin&c=Book&a=index">图书管理</a>
+                    </li>
+                    <li class="active">
+                        <a href="?p=Admin&c=User&a=index">用户管理</a>
+                    </li>
+                    <li>
+                        <a href="?p=Admin&c=Borrow&a=index">借阅管理</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="JavaScript:void(0)" style="cursor:default">{<$smarty.session.userId>}</a>
+                    </li>
+                    <li>
+                        <a href="?p=Common&c=Login&a=logout">退出</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+    <div class="text-center container" style="width:65%;margin-top:40px;padding-top:10px;background-color:rgba(255, 255, 255, 0.55);border-radius:20px;">
+        <div class="h4">
+            <b>用户信息</b>
+        </div>
+		<table class="table table-bordered table-hover text-center" style="margin-top:30px;width:40%;margin:0 auto">
+            <thead>
+                
+				<tr>
+					<td><strong>ID</strong></td>
+					<td>{<$userInfo.id>}</td>
+				</tr>
+				<tr>
+					<td><strong>姓名<strong></td>
+					<td>{<$userInfo.name>}</td>
+				</tr>
+				<tr>
+					<td><strong>图书馆<strong></td>
+					<td>{<$userInfo.class>}</td>
+				</tr>
+				<tr>
+					<td><strong>手机号<strong></td>
+					<td>{<$userInfo.mobile>}</td>
+				</tr>
+				<tr>
+					<td><strong>QQ号<strong></td>
+					<td>{<$userInfo.qq>}</td>
+				</tr>
+				<tr>
+					<td><strong>电子邮箱<strong></td>
+					<td>{<$userInfo.email>}</td>
+				</tr>
+				<tr>
+					<td><strong>邮政编码<strong></td>
+					<td>{<$userInfo.postcode>}</td>
+				</tr>
+				<tr>
+					<td><strong>联系地址<strong></td>
+					<td>{<$userInfo.address>}</td>
+				</tr>
+				<tr>
+					<td><strong>状态<strong></td>
+					<td>{<if $userInfo.status>}正常{<else>}<font color='red'>挂失</font>{</if>}</td>
+				</tr>
+            </thead>
+		</table>
+        <div style="width: 450px;margin:20px auto;overflow: hidden;display: flex;justify-content: space-between">
+            <button class="btn btn-success" data-toggle="modal" data-target="#info">修改账户</button>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#lock"> {<if $userInfo.status>}挂失{<else>}启用{</if>}账户</button>
+            <button class="btn btn-warning" data-toggle="modal" data-target="#pwd">修改密码</button>
+            <button class="btn btn-danger" data-toggle="modal" data-target="#del">删除账户</button>
+        </div>
+    </div>
+    <div class="container text-center" style="width: 65%;margin-top:30px;padding:0;">
+        <div class="h4">
+            <b>用户借阅信息</b>
+        </div>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr class="active">
+                    <th class="text-center">图书号</th>
+                    <th class="text-center">图书名称</th>
+                    <th class="text-center">借书时间</th>
+                    <th class="text-center">应还时间</th>
+                    <th class="text-center" style="width:100px;">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {<if empty($borrowInfo)>}
+                    <tr>
+                        <td colspan="5">无记录！</td>
+                    </tr>
+                {</if>}
+                {<foreach $borrowInfo as $one>}
+                    <tr {<if strtotime($one.back_date) < time()>}class="danger"{</if>}>
+                        <td>{<$one.id>}</td>
+                        <td>{<$one.name>}</td>
+                        <td>{<$one.borrow_date>}</td>
+                        <td>{<$one.back_date>}</td>
+                        <td bookId="{<$one.id>}">
+                            <button class="btn btn-info btn-xs prolong {<if strtotime($one.back_date) < time()>}disabled{</if>}">续借</button>&nbsp;
+                            <button class="btn btn-success btn-xs return">归还</button>
+                        </td>
+                    </tr>
+                {</foreach>}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container-fluid text-center">
+        <!-- 修改用户信息模态框（Modal） -->
+        <div class="modal fade" id="info" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="margin-top:150px;">
+                <div class="modal-content">
+                    <form id="changeInfo">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="myModalLabel">
+                                修改用户信息
+                            </h4>
+                        </div>
+                        <div class="modal-body center-block" style="width:60%">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">姓名</div>
+                                    <input name="name" type="text" class="form-control" value="{<$userInfo.name>}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">图书馆</div>
+                                    <input name="class" type="text" class="form-control" value="{<$userInfo.class>}">
+                                </div>
+                            </div>
+							<div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">手机号</div>
+                                    <input name="mobile" type="text" class="form-control" value="{<$userInfo.mobile>}">
+                                </div>
+                            </div>
+							<div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">QQ号</div>
+                                    <input name="qq" type="text" class="form-control" value="{<$userInfo.qq>}">
+                                </div>
+                            </div>
+							<div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">电子邮箱</div>
+                                    <input name="email" type="text" class="form-control" value="{<$userInfo.email>}">
+                                </div>
+                            </div>
+							<div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">邮政编码</div>
+                                    <input name="postcode" type="text" class="form-control" value="{<$userInfo.postcode>}">
+                                </div>
+                            </div>
+						</div>
+						<div class="modal-body center-block" style="width:80%">
+							<div class="form-group">
+                                <div class="input-group" style="height:100px">
+                                    <div class="input-group-addon" >联系地址</div>
+                                    <input name="address" type="text" class="form-control" value="{<$userInfo.address>}"  style="height:100px">
+                                </div>
+                            </div>
+						</div>	 
+                        
+                        <div class="modal-footer">
+                            <button id="changeButton" type="button" class="btn btn-primary">确认</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+
+        <!-- 挂失用户模态框（Modal） -->
+        <div class="modal fade" id="lock" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="margin-top:150px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">
+                            {<if $userInfo.status>}挂失{<else>}启用{</if>}账户
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <h4>确认要{<if $userInfo.status>}挂失{<else>}启用{</if>}账号为{<$userInfo.id>}的账户?</h3>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="{<if $userInfo.status>}lostButton{<else>}openButton{</if>}" class="btn btn-primary">确认</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+
+        <!-- 修改密码模态框（Modal） -->
+        <div class="modal fade" id="pwd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="margin-top:150px;">
+                <div class="modal-content">
+                    <div>
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="myModalLabel">
+                                修改密码
+                            </h4>
+                        </div>
+                        <div class="modal-body center-block" style="width:45%">
+                            <div class="form-group " style="margin-bottom:0">
+                                <div class="input-group">
+                                    <div class="input-group-addon">新密码</div>
+                                    <input id="newPwd" type="password" class="form-control" placeholder="请输入新密码">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="pwdButton" type="button" class="btn btn-primary">确认</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+
+        <!-- 删除用户模态框（Modal） -->
+        <div class="modal fade" id="del" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="margin-top:150px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">
+                            删除账户
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <h4>确认要删除账号为{<$userInfo.id>}的账户?</h3>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="deleteButton" class="btn btn-primary">确认</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+    </div>
+</body>
+<script>
+
+    $(function(){
+
+        //更改信息
+        $("#changeButton").click(function(){
+            $.post({
+                url: "?p=Admin&c=User&a=changeInfo",
+                data: "userId={<$userInfo.id>}&" + $("#changeInfo").serialize(),
+                success:function(data){
+                    alert(data.message);
+                    if(data.code == 0){
+                        location.reload();
+                    }
+                }
+            })
+        });
+
+        //挂失和启用
+        $("#{<if $userInfo.status>}lostButton{<else>}openButton{</if>}").click(function(){
+            $.post({
+                url: "?p=Admin&c=User&a={<if $userInfo.status>}lost{<else>}open{</if>}",
+                data:{
+                    userId : "{<$userInfo.id>}"
+                },
+                success:function(data){
+                    alert(data.message);
+                    if(data.code == 0){
+                        location.reload();
+                    }
+                }
+            })
+        });
+
+        //修改密码
+        $("#pwdButton").click(function(){
+            $.post({
+                url: "?p=Admin&c=User&a=changePwd",
+                data:{
+                    userId : "{<$userInfo.id>}",
+                    pwd : $("#newPwd").val()
+                },
+                success:function(data){
+                    alert(data.message);
+                    if(data.code == 0){
+                        location.reload();
+                    }
+                }
+            })
+        });
+
+        //删除用户
+        $("#deleteButton").click(function(){
+            $.post({
+                url: "?p=Admin&c=User&a=delete",
+                data:{
+                    userId : "{<$userInfo.id>}"
+                },
+                success:function(data){
+                    alert(data.message);
+                    if(data.code == 0){
+                        location.href = "?p=Admin&c=User&a=index";
+                    }
+                }
+            })
+        });
+
+        //续借
+        $(".prolong").click(function(){
+            $.post({
+                url: "?p=Admin&c=Borrow&a=prolong",
+                data:{
+                    bookId : $(this).parent().attr("bookID"),
+                    userId : "{<$userInfo.id>}"
+                },
+                success:function(data){
+                    alert(data.message);
+                    if(data.code == 0){
+                        location.reload();
+                    }
+                }
+            })
+        });
+
+        //还书
+        $(".return").click(function(){
+            $.post({
+                url: "?p=Admin&c=Borrow&a=returnBook",
+                data:{
+                    bookId : $(this).parent().attr("bookID"),
+                    userId : "{<$userInfo.id>}"
+                },
+                success:function(data){
+                    alert(data.message);
+                    if(data.code == 0){
+                        location.reload();
+                    }
+                }
+            })
+        });
+
+    })
+
+</script>
+
+</html>
